@@ -1,0 +1,78 @@
+--- Panel.qml
++++ Panel.qml
+@@ -11,6 +11,9 @@
+   ipcTarget: "omarchy.weather"
+   manageIpc: false
+ 
++  // Strings come from ~/.config/omarchy/locales/<language>.json.
++  Translations { id: i18n }
++
+   property var anchorItem: null
+   property bool openedFromHotkey: false
+ 
+@@ -308,7 +311,10 @@
+   }
+ 
+   function dayName(dateString) {
+-    return Model.dayName(dateString, function(date) { return Qt.formatDate(date, "dddd") })
++    // Qt.formatDate() renders through the C locale whatever LANG says, so
++    // every forecast day would read English. The same format through the
++    // locale gives "sreda".
++    return Model.dayName(dateString, function(date) { return date.toLocaleDateString(Qt.locale(), "dddd") })
+   }
+ 
+   // Bare degree value (no unit letter), used in the forecast row.
+@@ -616,7 +622,7 @@
+               id: locationField
+               width: Style.space(190)
+               enabled: !root.savingLocation
+-              placeholderText: "Search city"
++              placeholderText: i18n.t("Search city")
+               foreground: root.bar.foreground
+               font.family: root.bar.fontFamily
+ 
+@@ -683,7 +689,7 @@
+             Column {
+               spacing: Style.space(5)
+               Text {
+-                text: "FEELS"
++                text: i18n.t("FEELS")
+                 color: Qt.darker(root.bar.foreground, 1.5)
+                 font.family: root.bar.fontFamily
+                 font.pixelSize: Style.font.bodySmall
+@@ -701,7 +707,7 @@
+             Column {
+               spacing: Style.space(5)
+               Text {
+-                text: "WIND"
++                text: i18n.t("WIND")
+                 color: Qt.darker(root.bar.foreground, 1.5)
+                 font.family: root.bar.fontFamily
+                 font.pixelSize: Style.font.bodySmall
+@@ -719,7 +725,7 @@
+             Column {
+               spacing: Style.space(5)
+               Text {
+-                text: "HUMID"
++                text: i18n.t("HUMID")
+                 color: Qt.darker(root.bar.foreground, 1.5)
+                 font.family: root.bar.fontFamily
+                 font.pixelSize: Style.font.bodySmall
+@@ -792,7 +798,7 @@
+ 
+       Text {
+         visible: !root.current
+-        text: "Fetching forecast…"
++        text: i18n.t("Fetching forecast…")
+         color: Qt.darker(root.bar.foreground, 1.5)
+         font.family: root.bar.fontFamily
+         font.pixelSize: Style.font.bodySmall
+@@ -843,7 +849,7 @@
+ 
+                 Text {
+                   textFormat: Text.PlainText
+-                  text: root.dayName(modelData.date).toUpperCase()
++                  text: root.dayName(modelData.date).toLocaleUpperCase(Qt.locale().name.replace("_", "-"))
+                   color: Qt.darker(root.bar.foreground, 1.4)
+                   font.family: root.bar.fontFamily
+                   font.pixelSize: Style.font.caption

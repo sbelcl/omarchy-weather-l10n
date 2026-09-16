@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "sbelcl.weather",
+  "name": "Weather (translated)",
+  "version": "1.0.0",
+  "author": "sbelcl",
+  "description": "Omarchy's weather panel, with its strings read from a translation catalog and day names from the system locale",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Weather (translated)",
+    "description": "Weather pill with detail popup",
+    "category": "Info",
+    "allowMultiple": false,
+    "settingsForm": "weatherSettings"
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.weather"
+  }
+}
