@@ -149,7 +149,10 @@ Panel {
   readonly property string reportTempNum:   current ? String(useImperial ? current.temp_F : current.temp_C) : ""
   readonly property string tempUnit:        "°" + (useImperial ? "F" : "C")
   readonly property string reportFeels:     current ? formatTemp(useImperial ? current.FeelsLikeF : current.FeelsLikeC) : ""
-  readonly property string reportWind:      current ? (useImperial ? (current.windspeedMiles + " mph") : (current.windspeedKmph + " km/h")) : ""
+  // Russian forecasts use m/s (Roshydromet standard) — km/h reads as foreign.
+  // Gated on the locale language so every other locale keeps km/h.
+  readonly property bool useMetersPerSecond: String(Qt.locale().name).split("_")[0] === "ru"
+  readonly property string reportWind:      current ? (useImperial ? (current.windspeedMiles + " mph") : (useMetersPerSecond ? (current.windspeedMps + " m/s") : (current.windspeedKmph + " km/h"))) : ""
   readonly property string reportHumidity:  current ? (current.humidity + "%") : ""
 
   function refresh() {
