@@ -10,7 +10,19 @@
    property var anchorItem: null
    property bool openedFromHotkey: false
  
-@@ -308,7 +311,10 @@
+@@ -146,7 +149,10 @@
+   readonly property string reportTempNum:   current ? String(useImperial ? current.temp_F : current.temp_C) : ""
+   readonly property string tempUnit:        "°" + (useImperial ? "F" : "C")
+   readonly property string reportFeels:     current ? formatTemp(useImperial ? current.FeelsLikeF : current.FeelsLikeC) : ""
+-  readonly property string reportWind:      current ? (useImperial ? (current.windspeedMiles + " mph") : (current.windspeedKmph + " km/h")) : ""
++  // Russian forecasts use m/s (Roshydromet standard) — km/h reads as foreign.
++  // Gated on the locale language so every other locale keeps km/h.
++  readonly property bool useMetersPerSecond: String(Qt.locale().name).split("_")[0] === "ru"
++  readonly property string reportWind:      current ? (useImperial ? (current.windspeedMiles + " mph") : (useMetersPerSecond ? (current.windspeedMps + " m/s") : (current.windspeedKmph + " km/h"))) : ""
+   readonly property string reportHumidity:  current ? (current.humidity + "%") : ""
+ 
+   function refresh() {
+@@ -308,7 +314,10 @@
    }
  
    function dayName(dateString) {
@@ -22,7 +34,7 @@
    }
  
    // Bare degree value (no unit letter), used in the forecast row.
-@@ -616,7 +622,7 @@
+@@ -616,7 +625,7 @@
                id: locationField
                width: Style.space(190)
                enabled: !root.savingLocation
@@ -31,7 +43,7 @@
                foreground: root.bar.foreground
                font.family: root.bar.fontFamily
  
-@@ -683,7 +689,7 @@
+@@ -683,7 +692,7 @@
              Column {
                spacing: Style.space(5)
                Text {
@@ -40,7 +52,7 @@
                  color: Qt.darker(root.bar.foreground, 1.5)
                  font.family: root.bar.fontFamily
                  font.pixelSize: Style.font.bodySmall
-@@ -701,7 +707,7 @@
+@@ -701,7 +710,7 @@
              Column {
                spacing: Style.space(5)
                Text {
@@ -49,7 +61,7 @@
                  color: Qt.darker(root.bar.foreground, 1.5)
                  font.family: root.bar.fontFamily
                  font.pixelSize: Style.font.bodySmall
-@@ -719,7 +725,7 @@
+@@ -719,7 +728,7 @@
              Column {
                spacing: Style.space(5)
                Text {
@@ -58,7 +70,7 @@
                  color: Qt.darker(root.bar.foreground, 1.5)
                  font.family: root.bar.fontFamily
                  font.pixelSize: Style.font.bodySmall
-@@ -792,7 +798,7 @@
+@@ -792,7 +801,7 @@
  
        Text {
          visible: !root.current
@@ -67,7 +79,7 @@
          color: Qt.darker(root.bar.foreground, 1.5)
          font.family: root.bar.fontFamily
          font.pixelSize: Style.font.bodySmall
-@@ -843,7 +849,7 @@
+@@ -843,7 +852,7 @@
  
                  Text {
                    textFormat: Text.PlainText
@@ -76,3 +88,13 @@
                    color: Qt.darker(root.bar.foreground, 1.4)
                    font.family: root.bar.fontFamily
                    font.pixelSize: Style.font.caption
+--- Model.js
++++ Model.js
+@@ -166,6 +166,7 @@
+     FeelsLikeC: roundedTemp(current.apparent_temperature),
+     FeelsLikeF: roundedTemp(celsiusToFahrenheit(current.apparent_temperature)),
+     windspeedKmph: roundedTemp(current.wind_speed_10m),
++    windspeedMps: roundedTemp(current.wind_speed_10m / 3.6),
+     windspeedMiles: roundedTemp(current.wind_speed_10m * 0.621371),
+     humidity: roundedTemp(current.relative_humidity_2m),
+     openMeteoWeatherCode: current.weather_code,
