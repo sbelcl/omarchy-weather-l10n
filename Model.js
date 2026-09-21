@@ -166,6 +166,7 @@ function openMeteoCurrentCondition(dailyForecastReport) {
     FeelsLikeC: roundedTemp(current.apparent_temperature),
     FeelsLikeF: roundedTemp(celsiusToFahrenheit(current.apparent_temperature)),
     windspeedKmph: roundedTemp(current.wind_speed_10m),
+    windspeedMps: roundedTemp(current.wind_speed_10m / 3.6),
     windspeedMiles: roundedTemp(current.wind_speed_10m * 0.621371),
     humidity: roundedTemp(current.relative_humidity_2m),
     openMeteoWeatherCode: current.weather_code,
