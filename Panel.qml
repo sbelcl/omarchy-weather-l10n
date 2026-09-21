@@ -149,10 +149,19 @@ Panel {
   readonly property string reportTempNum:   current ? String(useImperial ? current.temp_F : current.temp_C) : ""
   readonly property string tempUnit:        "°" + (useImperial ? "F" : "C")
   readonly property string reportFeels:     current ? formatTemp(useImperial ? current.FeelsLikeF : current.FeelsLikeC) : ""
-  // Russian forecasts use m/s (Roshydromet standard) — km/h reads as foreign.
-  // Gated on the locale language so every other locale keeps km/h.
-  readonly property bool useMetersPerSecond: String(Qt.locale().name).split("_")[0] === "ru"
-  readonly property string reportWind:      current ? (useImperial ? (current.windspeedMiles + " mph") : (useMetersPerSecond ? (current.windspeedMps + " m/s") : (current.windspeedKmph + " km/h"))) : ""
+  // Which unit a language shows is a convention of that language, not a
+  // metric/imperial split -- useImperial already covers that one. Russia and
+  // the Nordics read wind in m/s where most of Europe reads km/h, so the unit
+  // is a catalog entry rather than a list of language codes in here.
+  //
+  // The key is the default unit and its translation is the unit shown:
+  // "m/s" converts the value and prints m/s; anything else prints km/h with
+  // whatever label the catalog gave, so a language that wants only a
+  // localised label ("км/ч") gets it without changing the number.
+  readonly property string windUnit:        useImperial ? "mph" : i18n.t("km/h")
+  readonly property string reportWind:      current ? (useImperial
+    ? (current.windspeedMiles + " mph")
+    : ((windUnit === "m/s" ? current.windspeedMps : current.windspeedKmph) + " " + windUnit)) : ""
   readonly property string reportHumidity:  current ? (current.humidity + "%") : ""
 
   function refresh() {
